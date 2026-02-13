@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("SUBSCRIBER") // ADMIN, CREATOR, SUBSCRIBER
+  invitedAt    DateTime?
+  vipActive    Boolean  @default(false)
+  vipTier      String   @default("VIP_BASIC")  // VIP_BASIC, VIP_PLUS, VIP_ELITE
+  banned       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model Invite {
+  code        String   @id
+  maxUses     Int      @default(1)
+  usedCount   Int      @default(0)
+  expiresAt   DateTime
+  tierGranted String   @default("VIP_BASIC")
+  createdAt   DateTime @default(now())
+}
+
+model Room {
+  id           String   @id @default(cuid())
+  creatorId    String
+  type         String   // STREAM, GROUP, PRIVATE
+  requiredTier String   @default("VIP_BASIC")
+  isLive       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
